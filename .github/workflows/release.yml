@@ -1,0 +1,110 @@
+# Build + Test bei jedem manuellen Start (workflow_dispatch);
+# bei einem Tag-Push (v*) zusaetzlich: Release mit EXE + Quellpaket + feed.json.
+#
+# Kostenlos fuer oeffentliche Repos. Dieser kontrollierte CI-Build ist auch die
+# Voraussetzung fuer kostenloses OSS-Code-Signing via SignPath Foundation
+# (https://signpath.org) — deren Signierschritt wuerde nach dem Build eingehaengt.
+#
+# Optionales Signieren mit eigenem Zertifikat: Repo-Secrets CODESIGN_PFX
+# (Base64 einer .pfx) und CODESIGN_PWD anlegen — der Sign-Schritt springt
+# sonst einfach weiter.
+name: release
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Abhaengigkeiten installieren
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest httpx pyinstaller pillow
+
+      - name: Tests
+        run: python -m pytest -q
+
+      - name: Icon + EXE bauen
+        run: |
+          python build/make_icon.py
+          pyinstaller --noconfirm --onefile --windowed --name CrashAnalyzer `
+            --icon "$PWD\build\CrashAnalyzer.ico" --paths "$PWD" `
+            --add-data "$PWD\src\web;src/web" --add-data "$PWD\src\kb;src/kb" `
+            --add-data "$PWD\VERSION;." --collect-submodules uvicorn `
+            --distpath "$PWD\dist" --workpath "$PWD\build\pyi" `
+            --specpath "$PWD\build" "$PWD\build\entry.py"
+
+      - name: Signieren (nur wenn Zertifikat-Secrets vorhanden)
+        if: ${{ secrets.CODESIGN_PFX != '' }}
+        env:
+          PFX: ${{ secrets.CODESIGN_PFX }}
+          PWD_SECRET: ${{ secrets.CODESIGN_PWD }}
+        run: |
+          [IO.File]::WriteAllBytes("codesign.pfx", [Convert]::FromBase64String($env:PFX))
+          $pfxPwd = ConvertTo-SecureString $env:PWD_SECRET -AsPlainText -Force
+          $cert = Import-PfxCertificate -FilePath codesign.pfx -CertStoreLocation Cert:\CurrentUser\My -Password $pfxPwd
+          ./build/sign.ps1 -Thumbprint $cert.Thumbprint
+          Remove-Item codesign.pfx
+
+      - name: EXE-Smoke-Test
+        run: |
+          Start-Process -FilePath "dist\CrashAnalyzer.exe" -ArgumentList "--no-window","--port","8799"
+          Start-Sleep -Seconds 10
+          $meta = Invoke-RestMethod "http://127.0.0.1:8799/api/meta" -TimeoutSec 15
+          if ($meta.version -notmatch '^\d+\.\d+\.\d+$' -or -not $meta.frozen) { throw "Smoke-Test fehlgeschlagen: $($meta | ConvertTo-Json -Compress)" }
+          Write-Host "Smoke ok: Version $($meta.version), frozen=$($meta.frozen)"
+          Get-Process CrashAnalyzer | Stop-Process -Force
+
+      - name: Release-Paket + Feed erzeugen
+        run: python build/make_release.py --notes "Automatischer CI-Build ($env:GITHUB_REF_NAME)"
+
+      - name: Artefakte hochladen (Nachvollziehbarkeit)
+        uses: actions/upload-artifact@v4
+        with:
+          name: crash-analyzer-build
+          path: |
+            dist/CrashAnalyzer.exe
+            release/*.zip
+            release/feed.json
+
+      - name: GitHub-Release anlegen (nur bei Tag)
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = (Get-Content VERSION -Raw).Trim()
+          $exeSha = (Get-FileHash dist/CrashAnalyzer.exe -Algorithm SHA256).Hash.ToLower()
+          $zipSha = (Get-FileHash "release/crash-analyzer-$version.zip" -Algorithm SHA256).Hash.ToLower()
+          $notes = "CI-Build.`n`n**SHA256:**`n- CrashAnalyzer.exe: ``$exeSha```n- crash-analyzer-$version.zip: ``$zipSha``"
+          gh release create "$env:GITHUB_REF_NAME" `
+            "dist/CrashAnalyzer.exe" "release/crash-analyzer-$version.zip" `
+            --title "Crash Analyzer $version" --notes "$notes"
+
+      - name: feed.json auf main committen (nur bei Tag)
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          git fetch origin main
+          git switch main
+          Copy-Item release/feed.json feed.json -Force
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add feed.json
+          git diff --staged --quiet
+          if ($LASTEXITCODE -ne 0) {
+            git commit -m "Update-Feed $env:GITHUB_REF_NAME (CI)"
+            git push origin main
+          } else {
+            Write-Host "feed.json unveraendert - kein Commit noetig."
+          }

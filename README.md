@@ -104,6 +104,31 @@ SmartScreen-Reputation). Sobald vorhanden: signieren mit
 **Signieren gehört in den Release-Ablauf:** nach dem PyInstaller-Build und vor
 `make_release.py`/Upload `.\build\sign.ps1` ausführen.
 
+### Kostenlose Optionen (realistisch eingeordnet)
+
+Eine sofort wirksame Gratis-Lösung gegen SmartScreen gibt es nicht. Was es gibt:
+
+1. **SignPath Foundation** (signpath.org) — kostenloses, öffentlich vertrautes
+   Code-Signing für Open-Source-Projekte. Voraussetzungen: OSS-Lizenz (MIT ✓),
+   kontrollierter CI-Build (GitHub-Actions-Workflow ✓ vorhanden), etwas
+   Projekt-Historie und Aktivität (junges Projekt → Bewerbung nach ein paar
+   Wochen/Releases sinnvoll). Das Zertifikat lautet auf „SignPath Foundation"
+   mit Projektnamen. Der Signierschritt wird dann im Workflow eingehängt.
+2. **SmartScreen-Reputation abwarten** — mit jeder heruntergeladenen und ohne
+   Vorfall ausgeführten Kopie baut die Datei Reputation auf, die Warnung
+   verschwindet von selbst. Haken: gilt pro Datei-Hash, jedes neue Release
+   beginnt bei null.
+3. **winget** (Windows-Paketmanager) — kostenlose Aufnahme ins offizielle
+   Repository; Installation dann per `winget install`, ohne Browser-
+   Download-Warnung.
+4. **Eigene/Firmen-Rechner:** Zertifikat `build\AlexanderMay-CodeSigning.cer`
+   importieren (siehe oben) — kostenlos und sofort wirksam.
+
+Der GitHub-Actions-Workflow ([.github/workflows/release.yml](.github/workflows/release.yml))
+baut, testet und veröffentlicht bei einem Tag-Push (`git tag v1.0.1 && git push --tags`)
+automatisch Release + Feed — und ist zugleich die technische Voraussetzung für
+Option 1.
+
 ## Grenzen
 
 - Ein Freeze, der sich von selbst löst (ohne Neustart), hinterlässt keine
