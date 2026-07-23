@@ -5,9 +5,18 @@ Windows-Desktop-App, die nach einem Absturz analysiert, **was** passiert ist,
 Nicht-Techniker. Diagnose-Prüftools sind direkt eingebaut, die App kann sich
 selbst aktualisieren. Alle Daten bleiben auf dem Rechner.
 
-## Start
+## Download (Windows-EXE)
 
-Doppelklick auf **`CrashAnalyzer.bat`**.
+**⬇ [CrashAnalyzer.exe herunterladen](https://github.com/Alex1977-code/CrashAnalyzer/releases/latest/download/CrashAnalyzer.exe)** — keine Installation nötig, einfach starten.
+
+- Für volle Funktion (Minidumps, SFC/DISM/CHKDSK) per Rechtsklick → **Als Administrator ausführen**.
+- Die EXE ist nicht signiert: Windows SmartScreen kann warnen — „Weitere Informationen" →
+  „Trotzdem ausführen". Die Prüfsumme (SHA256) steht in den [Release-Notes](https://github.com/Alex1977-code/CrashAnalyzer/releases/latest).
+- Einstellungen werden unter `%LOCALAPPDATA%\CrashAnalyzer` gespeichert.
+
+## Start aus dem Quellcode
+
+Repo klonen und Doppelklick auf **`CrashAnalyzer.bat`**.
 
 - Beim ersten Start wird einmalig eine Python-Umgebung eingerichtet (braucht
   Internet und ein installiertes Python 3.10+).
@@ -40,18 +49,29 @@ Datenträger-Gesundheit (SMART), Treiber-Inventar. Läufe starten nur auf Klick,
 zeigen Live-Ausgabe, sind abbrechbar und werden zu einem Verdikt
 (✓ / Hinweis / Problem) ausgewertet. Reparierende Tools sind gekennzeichnet.
 
-## Updates
+## Updates (aus diesem Repository)
 
-Einstellungen → Update-Feed-URL setzen. Feed-Format (JSON):
+Der Update-Feed ist ab Werk auf dieses Repo eingestellt
+([`feed.json`](https://raw.githubusercontent.com/Alex1977-code/CrashAnalyzer/main/feed.json)).
+Einstellungen → „Nach Updates suchen":
+
+- **Quell-Installation:** Das Update-Zip wird SHA256-geprüft nach `_staging/`
+  geladen; der Launcher installiert es beim nächsten Start (Backup nach
+  `_backup/<version>/`, automatischer Rollback bei Fehlern). `config.json` und
+  die venv werden nie überschrieben.
+- **EXE:** Die App zeigt einen Download-Link auf die neue EXE (eine Onefile-EXE
+  ersetzt sich nicht selbst).
+
+Neues Release veröffentlichen: Version in `VERSION` erhöhen →
+`python build/make_release.py` → GitHub-Release `v<version>` mit
+`CrashAnalyzer.exe` + `crash-analyzer-<version>.zip` anlegen → das erzeugte
+`release/feed.json` ins Repo-Root committen.
+
+Feed-Format (JSON):
 
 ```json
-{ "version": "1.1.0", "zip_url": "https://…/ca-1.1.0.zip", "sha256": "…", "notes": "…" }
+{ "version": "1.1.0", "zip_url": "…", "sha256": "…", "notes": "…", "exe_url": "…", "release_url": "…" }
 ```
-
-„Nach Updates suchen" → Download wird SHA256-geprüft und nach `_staging/`
-gelegt; der Launcher installiert es beim nächsten Start (mit Backup nach
-`_backup/<version>/` und automatischem Rollback bei Fehlern). `config.json`
-und die venv werden nie überschrieben.
 
 ## Grenzen
 
