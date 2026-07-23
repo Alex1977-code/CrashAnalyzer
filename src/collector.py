@@ -34,7 +34,7 @@ def build_ps_script(days: int) -> str:
     """Ein PowerShell-Skript, das alle Event-Quellen als ein JSON-Dokument liefert."""
     return r'''
 $ErrorActionPreference = 'Stop'
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 $since = (Get-Date).AddDays(-%DAYS%)
 $errors = New-Object System.Collections.ArrayList
 function Norm($e, $withMessage) {

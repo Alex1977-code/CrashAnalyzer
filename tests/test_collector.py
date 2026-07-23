@@ -89,6 +89,6 @@ def test_ps_skript_enthaelt_alle_quellen():
 def test_live_collect_auf_dieser_maschine():
     b = collector.collect(days=7)
     assert isinstance(b["is_admin"], bool)
-    assert b["system"].get("hostname")
+    assert b["system"].get("hostname"), f"system leer; limits: {b['limits']}"
     assert isinstance(b["events"], list)
     assert isinstance(b["app_events"], list)

@@ -9,7 +9,7 @@ from src.tools import parsers
 
 PS_DISK_HEALTH = r'''
 $ErrorActionPreference = 'SilentlyContinue'
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 $disks = Get-PhysicalDisk | ForEach-Object {
   $r = $null; try { $r = $_ | Get-StorageReliabilityCounter } catch {}
   [pscustomobject]@{
@@ -24,7 +24,7 @@ $disks = Get-PhysicalDisk | ForEach-Object {
 
 PS_DRIVER_INVENTORY = r'''
 $ErrorActionPreference = 'SilentlyContinue'
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 $drv = Get-CimInstance Win32_PnPSignedDriver |
   Where-Object { $_.DriverDate -and $_.DeviceName } | ForEach-Object {
     [pscustomobject]@{
