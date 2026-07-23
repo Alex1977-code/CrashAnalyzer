@@ -1,0 +1,8 @@
+{
+  "version": "1.0.0",
+  "zip_url": "https://github.com/Alex1977-code/CrashAnalyzer/releases/download/v1.0.0/crash-analyzer-1.0.0.zip",
+  "sha256": "eafc41ed3f77142e706c6eca764042a622182ec1a06a456920772dcaabd34986",
+  "notes": "Erstes Release: Absturz-Analyse mit Klartext-Diagnose, 7 Onboard-Prueftools, Selbst-Update aus diesem Repository.",
+  "exe_url": "https://github.com/Alex1977-code/CrashAnalyzer/releases/download/v1.0.0/CrashAnalyzer.exe",
+  "release_url": "https://github.com/Alex1977-code/CrashAnalyzer/releases/tag/v1.0.0"
+}
