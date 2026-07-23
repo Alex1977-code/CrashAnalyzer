@@ -1,7 +1,18 @@
 """Gemeinsame Fixture-Bausteine: synthetische Event-Bundles wie vom Collector."""
 from __future__ import annotations
 
+import struct
 from datetime import datetime, timedelta, timezone
+
+
+def make_dump64(code: int, params: tuple[int, int, int, int] = (0, 0, 0, 0)) -> bytes:
+    """Synthetischer 64-Bit-Kernel-Dump-Header (PAGEDU64-Layout)."""
+    buf = bytearray(b"\x00" * 0x2000)
+    buf[0:8] = b"PAGEDU64"
+    struct.pack_into("<I", buf, 0x38, code)
+    for i, p in enumerate(params):
+        struct.pack_into("<Q", buf, 0x40 + 8 * i, p)
+    return bytes(buf)
 
 TZ = timezone(timedelta(hours=2))
 BASE = datetime(2026, 7, 10, 3, 34, 0, tzinfo=TZ)
