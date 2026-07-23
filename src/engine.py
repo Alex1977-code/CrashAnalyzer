@@ -355,15 +355,18 @@ def _aggregate_recommendations(episodes: list[dict]) -> list[dict]:
 def _group_app_crashes(app_events: list[dict]) -> dict:
     groups: dict[tuple[str, str], dict] = {}
     for e in app_events:
-        app = e["data"].get("param1", "unbekannt")
+        data = e["data"]
+        # Win11 benennt die Felder (AppName/ModuleName), ältere Windows nur param1..N
+        app = data.get("AppName") or data.get("param1") or "unbekannt"
+        module = data.get("ModuleName") or data.get("param4")
         kind = "hang" if e["id"] == 1002 else "crash"
         g = groups.setdefault((app, kind), {
             "app": app, "kind": kind, "count": 0, "last_time": e["time"], "modules": Counter(),
         })
         g["count"] += 1
         g["last_time"] = max(g["last_time"], e["time"])
-        if kind == "crash" and e["data"].get("param4"):
-            g["modules"][e["data"]["param4"]] += 1
+        if kind == "crash" and module:
+            g["modules"][module] += 1
     out = []
     for g in groups.values():
         modules = g.pop("modules")

@@ -45,8 +45,10 @@ function Norm($e, $withMessage) {
     foreach ($d in $x.Event.EventData.Data) {
       $i++
       if ($d -is [string]) { $data["param$i"] = $d }
-      elseif ($d.Name) { $data[$d.Name] = "$($d.'#text')" }
-      else { $data["param$i"] = "$($d.'#text')" }
+      elseif ($d -is [System.Xml.XmlElement] -and $d.HasAttribute('Name')) {
+        $data[$d.GetAttribute('Name')] = "$($d.InnerText)"
+      }
+      else { $data["param$i"] = "$($d.InnerText)" }
     }
   } catch {}
   $o = @{

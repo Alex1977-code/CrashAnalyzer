@@ -51,6 +51,14 @@ def create_app(collect_fn=None, tools=None, root=None,
     cache: dict = {"key": None, "result": None}
     cache_lock = threading.Lock()
 
+    @app.middleware("http")
+    async def no_store(request, call_next):
+        # Selbst-updatende App: nach einem Update darf kein Browser/WebView2
+        # veraltete Module aus dem HTTP-Cache laden.
+        response = await call_next(request)
+        response.headers["Cache-Control"] = "no-store"
+        return response
+
     # ---------- Meta / Analyse ----------
 
     @app.get("/api/meta")

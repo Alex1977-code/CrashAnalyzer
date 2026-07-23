@@ -193,6 +193,19 @@ def test_app_crashes_gruppiert_und_gezaehlt():
     assert a["summary"]["app_crash_count"] == 4
 
 
+def test_app_crashes_mit_benannten_feldern_win11():
+    # Windows 11 benennt EventData-Felder (AppName/ModuleName statt param1/param4)
+    crash = ev(1000, "Application Error", BASE - timedelta(days=1), log="Application",
+               AppName="TextureMesh.exe", ModuleName="ucrtbase.dll",
+               ExceptionCode="c0000005")
+    hang = ev(1002, "Application Hang", BASE - timedelta(days=2), log="Application",
+              AppName="Notepad.exe", HangType="Cross-thread")
+    a = analyze(app_events=[crash, hang])
+    groups = {g["app"]: g for g in a["app_crashes"]["groups"]}
+    assert groups["TextureMesh.exe"]["top_module"] == "ucrtbase.dll"
+    assert groups["Notepad.exe"]["kind"] == "hang"
+
+
 def test_empfehlungen_aggregiert_dedupliziert_sortiert():
     a = analyze([
         kernel_power_41(BASE, bugcheck_code=0x1A),
