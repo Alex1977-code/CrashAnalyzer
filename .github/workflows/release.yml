@@ -21,6 +21,8 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      HAS_CODESIGN: ${{ secrets.CODESIGN_PFX != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -47,7 +49,7 @@ jobs:
             --specpath "$PWD\build" "$PWD\build\entry.py"
 
       - name: Signieren (nur wenn Zertifikat-Secrets vorhanden)
-        if: ${{ secrets.CODESIGN_PFX != '' }}
+        if: env.HAS_CODESIGN == 'true'
         env:
           PFX: ${{ secrets.CODESIGN_PFX }}
           PWD_SECRET: ${{ secrets.CODESIGN_PWD }}
