@@ -4,7 +4,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-DEFAULTS = {"days": 30, "update": {"feed_url": ""}}
+DEFAULT_FEED_URL = "https://raw.githubusercontent.com/Alex1977-code/CrashAnalyzer/main/feed.json"
+DEFAULTS = {"days": 30, "update": {"feed_url": DEFAULT_FEED_URL}}
 
 
 def load_config(root: str | Path) -> dict:

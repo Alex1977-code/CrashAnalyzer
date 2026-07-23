@@ -90,7 +90,13 @@ export async function renderSettings(root, ctx) {
       if (info.available) {
         updResult.textContent = `Version ${info.latest} verfügbar (installiert: ${info.current}).` +
           (info.notes ? ` Hinweise: ${info.notes}` : "");
-        downloadBtn.hidden = false;
+        if (status.state === "exe") {
+          // EXE ersetzt sich nicht selbst — Download-Link anbieten
+          const url = info.exe_url || info.release_url || info.zip_url;
+          updResult.innerHTML += ` <a href="${esc(url)}" target="_blank" rel="noopener">Neue Version herunterladen</a>`;
+        } else {
+          downloadBtn.hidden = false;
+        }
       } else {
         updResult.textContent = `Du bist aktuell (Version ${info.current}).`;
       }

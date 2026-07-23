@@ -12,7 +12,7 @@ from pydantic import BaseModel, field_validator
 
 from src import collector as collector_mod
 from src import config as config_mod
-from src import engine, updater
+from src import engine, paths, updater
 from src.tools import registry as registry_mod
 from src.tools.runner import RunManager, ToolBusy
 
@@ -38,11 +38,13 @@ class ConfigIn(BaseModel):
         return v
 
 
-def create_app(collect_fn=None, tools=None, root=None,
+def create_app(collect_fn=None, tools=None, root=None, data_root=None,
                is_admin_fn=None, run_manager=None) -> FastAPI:
     collect_fn = collect_fn or (lambda days: collector_mod.collect(days))
     tools = tools if tools is not None else registry_mod.all_tools()
-    root = Path(root) if root else updater.APP_ROOT
+    # root: Code/VERSION (in der EXE das Bundle); cfg_root: veränderliche Daten
+    root = Path(root) if root else paths.bundle_root()
+    cfg_root = Path(data_root) if data_root else (Path(root) if root else paths.data_root())
     is_admin_fn = is_admin_fn or collector_mod.is_admin
     mgr = run_manager or RunManager()
     tool_map = {t.id: t for t in tools}
@@ -67,6 +69,7 @@ def create_app(collect_fn=None, tools=None, root=None,
             "app": "Crash Analyzer",
             "version": updater.current_version(root),
             "is_admin": bool(is_admin_fn()),
+            "frozen": paths.is_frozen(),
             "web": WEB_DIR.is_dir(),
         }
 
@@ -85,15 +88,15 @@ def create_app(collect_fn=None, tools=None, root=None,
 
     @app.get("/api/config")
     def get_config():
-        cfg = config_mod.load_config(root)
+        cfg = config_mod.load_config(cfg_root)
         return {"days": cfg["days"], "feed_url": cfg["update"]["feed_url"]}
 
     @app.put("/api/config")
     def put_config(cfg_in: ConfigIn):
-        cfg = config_mod.load_config(root)
+        cfg = config_mod.load_config(cfg_root)
         cfg["days"] = cfg_in.days
         cfg["update"]["feed_url"] = cfg_in.feed_url
-        config_mod.save_config(root, cfg)
+        config_mod.save_config(cfg_root, cfg)
         return {"days": cfg["days"], "feed_url": cfg["update"]["feed_url"]}
 
     # ---------- Prüftools ----------
@@ -155,17 +158,22 @@ def create_app(collect_fn=None, tools=None, root=None,
     # ---------- Update ----------
 
     def _feed_url() -> str:
-        return config_mod.load_config(root)["update"]["feed_url"]
+        return config_mod.load_config(cfg_root)["update"]["feed_url"]
 
     @app.get("/api/update/status")
     def update_status():
         feed = _feed_url()
-        staged = updater.staged_version(root)
+        if not feed:
+            state = "unconfigured"
+        elif paths.is_frozen():
+            state = "exe"
+        else:
+            state = "staged" if updater.staged_version(root) else "idle"
         return {
             "current_version": updater.current_version(root),
             "feed_url": feed or None,
-            "state": "staged" if staged else ("idle" if feed else "unconfigured"),
-            "staged_version": staged,
+            "state": state,
+            "staged_version": None if paths.is_frozen() else updater.staged_version(root),
         }
 
     @app.post("/api/update/check")
@@ -183,6 +191,10 @@ def create_app(collect_fn=None, tools=None, root=None,
         feed = _feed_url()
         if not feed:
             raise HTTPException(400, "Kein Update-Feed konfiguriert (Einstellungen).")
+        if paths.is_frozen():
+            raise HTTPException(
+                400, "Im EXE-Modus installiert die App keine Pakete — bitte die neue "
+                     "Version über den Download-Link beziehen und die EXE ersetzen.")
         try:
             version = updater.download(feed, root)
         except updater.UpdateError as exc:

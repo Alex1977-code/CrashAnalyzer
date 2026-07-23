@@ -75,6 +75,8 @@ def check(feed_url: str, root: str | Path = APP_ROOT) -> dict:
         "current": cur,
         "notes": feed.get("notes") or "",
         "zip_url": feed["zip_url"],
+        "exe_url": feed.get("exe_url"),
+        "release_url": feed.get("release_url"),
     }
 
 

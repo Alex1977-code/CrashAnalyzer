@@ -18,7 +18,8 @@ def make_app_root(tmp_path: Path, version="1.0.0") -> Path:
     return root
 
 
-def make_feed(tmp_path: Path, version="1.1.0", zip_extra=None, break_hash=False) -> str:
+def make_feed(tmp_path: Path, version="1.1.0", zip_extra=None, break_hash=False,
+              feed_extra=None) -> str:
     feed_dir = tmp_path / "feed"
     feed_dir.mkdir(exist_ok=True)
     zip_path = feed_dir / f"crash-analyzer-{version}.zip"
@@ -32,10 +33,21 @@ def make_feed(tmp_path: Path, version="1.1.0", zip_extra=None, break_hash=False)
     if break_hash:
         digest = "0" * 64
     feed = {"version": version, "zip_url": zip_path.as_uri(),
-            "sha256": digest, "notes": "Testrelease"}
+            "sha256": digest, "notes": "Testrelease", **(feed_extra or {})}
     feed_path = feed_dir / "feed.json"
     feed_path.write_text(json.dumps(feed), encoding="utf-8")
     return feed_path.as_uri()
+
+
+def test_check_reicht_exe_und_release_links_durch(tmp_path):
+    root = make_app_root(tmp_path)
+    url = make_feed(tmp_path, "1.1.0", feed_extra={
+        "exe_url": "https://example.org/CrashAnalyzer.exe",
+        "release_url": "https://example.org/releases/v1.1.0",
+    })
+    info = updater.check(url, root=str(root))
+    assert info["exe_url"] == "https://example.org/CrashAnalyzer.exe"
+    assert info["release_url"] == "https://example.org/releases/v1.1.0"
 
 
 def test_check_erkennt_neue_version(tmp_path):

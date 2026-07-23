@@ -127,9 +127,32 @@ def test_unbekanntes_tool_404(app_env):
 
 def test_update_unkonfiguriert(app_env):
     client, _, _ = app_env
+    client.put("/api/config", json={"days": 30, "feed_url": ""})
     s = client.get("/api/update/status").json()
     assert s["state"] == "unconfigured"
     assert client.post("/api/update/check").status_code == 400
+
+
+def test_config_default_zeigt_auf_repo_feed(app_env):
+    client, _, _ = app_env
+    cfg = client.get("/api/config").json()
+    assert cfg["feed_url"].startswith("https://raw.githubusercontent.com/Alex1977-code/CrashAnalyzer/")
+
+
+def test_update_im_exe_modus(app_env, tmp_path, monkeypatch):
+    client, _, root = app_env
+    url = make_feed(tmp_path, "9.9.9", feed_extra={"release_url": "https://example.org/rel"})
+    client.put("/api/config", json={"days": 30, "feed_url": url})
+    import src.api as api_mod
+    monkeypatch.setattr(api_mod.paths, "is_frozen", lambda: True)
+    s = client.get("/api/update/status").json()
+    assert s["state"] == "exe"
+    info = client.post("/api/update/check").json()
+    assert info["available"] is True
+    assert info["release_url"] == "https://example.org/rel"
+    r = client.post("/api/update/download")
+    assert r.status_code == 400
+    assert "EXE" in r.json()["detail"]
 
 
 def test_update_check_und_download_mit_feed(app_env, tmp_path):
