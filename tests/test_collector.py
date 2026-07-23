@@ -77,11 +77,39 @@ def test_ps_fehler_bricht_nicht_ab(tmp_path):
     assert b["system"] == {}
 
 
+def test_run_powershell_akzeptiert_json_trotz_exitcode(monkeypatch):
+    # Runner/Pipe-Umgebungen liefern exit != 0, obwohl gueltiges JSON in stdout steht
+    import subprocess
+
+    class FakeProc:
+        returncode = 1
+        stdout = b'#< CLIXML noise\r\n{"system": {"hostname": "RUNNER"}, "events": []}'
+        stderr = b'<Objs>progress</Objs>'
+
+    monkeypatch.setattr(subprocess, "run", lambda *a, **k: FakeProc())
+    result = collector._run_powershell("egal")
+    assert result["system"]["hostname"] == "RUNNER"
+
+
+def test_run_powershell_meldet_fehler_ohne_json(monkeypatch):
+    import subprocess
+
+    class FakeProc:
+        returncode = 1
+        stdout = b""
+        stderr = b"schwerer Fehler"
+
+    monkeypatch.setattr(subprocess, "run", lambda *a, **k: FakeProc())
+    with pytest.raises(collector.CollectorError):
+        collector._run_powershell("egal")
+
+
 def test_ps_skript_enthaelt_alle_quellen():
     script = collector.build_ps_script(days=30)
     for needle in ("41,1001,6008", "WHEA-Logger", "MemoryDiagnostics-Results",
                    "WindowsUpdateClient", "'Application Error','Application Hang'",
-                   "Win32_OperatingSystem", "ConvertTo-Json"):
+                   "Win32_OperatingSystem", "ConvertTo-Json",
+                   "ProgressPreference"):
         assert needle in script, needle
 
 

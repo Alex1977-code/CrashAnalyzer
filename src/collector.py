@@ -34,9 +34,11 @@ def build_ps_script(days: int) -> str:
     """Ein PowerShell-Skript, das alle Event-Quellen als ein JSON-Dokument liefert."""
     return r'''
 $ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 $since = (Get-Date).AddDays(-%DAYS%)
 $errors = New-Object System.Collections.ArrayList
+try {
 function Norm($e, $withMessage) {
   $data = @{}
   try {
@@ -95,10 +97,20 @@ foreach ($e in ($sys1 + $sys2)) {
   $k = "$($e.record)"
   if (-not $seen.ContainsKey($k)) { $seen[$k] = $true; $events += $e }
 }
-@{
-  events = $events; app_events = $app; memdiag_events = $memd
-  update_events = $upd; system = $system; errors = @($errors)
-} | ConvertTo-Json -Depth 8 -Compress
+  @{
+    events = $events; app_events = $app; memdiag_events = $memd
+    update_events = $upd; system = $system; errors = @($errors)
+  } | ConvertTo-Json -Depth 8 -Compress
+} catch {
+  # Nie ohne JSON enden: den echten Fehler strukturiert zurueckgeben,
+  # damit die App weiterlaeuft und ihn unter "Grenzen" anzeigt.
+  [void]$errors.Add("Sammelfehler: $($_.Exception.Message)")
+  @{
+    events = @(); app_events = @(); memdiag_events = @()
+    update_events = @(); system = @{ hostname = $env:COMPUTERNAME }
+    errors = @($errors)
+  } | ConvertTo-Json -Depth 8 -Compress
+}
 '''.replace("%DAYS%", str(int(days)))
 
 
@@ -113,16 +125,19 @@ def _run_powershell(script: str) -> dict:
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise CollectorError(f"PowerShell-Aufruf fehlgeschlagen: {exc}") from exc
     out = proc.stdout.decode("utf-8", errors="replace").strip()
-    if proc.returncode != 0 and not out:
-        err = proc.stderr.decode("utf-8", errors="replace").strip()
-        raise CollectorError(f"PowerShell-Fehler (Exit {proc.returncode}): {err[:500]}")
+    # Gueltiges JSON in stdout gewinnt ueber den Exit-Code: PowerShell liefert
+    # je nach Umgebung (Runner, umgeleitetes stderr) exit != 0, obwohl die
+    # Ausgabe brauchbar ist. Nur wenn KEIN JSON vorliegt, ist es ein echter Fehler.
     start = out.find("{")
-    if start < 0:
-        raise CollectorError(f"Keine JSON-Ausgabe von PowerShell: {out[:200]!r}")
-    try:
-        return json.loads(out[start:])
-    except json.JSONDecodeError as exc:
-        raise CollectorError(f"PowerShell-JSON unlesbar: {exc}") from exc
+    if start >= 0:
+        try:
+            return json.loads(out[start:])
+        except json.JSONDecodeError:
+            pass
+    err = proc.stderr.decode("utf-8", errors="replace").strip()
+    if proc.returncode != 0:
+        raise CollectorError(f"PowerShell-Fehler (Exit {proc.returncode}): {err[:400]}")
+    raise CollectorError(f"Keine JSON-Ausgabe von PowerShell: {out[:200]!r}")
 
 
 def _norm_events(raw) -> list[dict]:

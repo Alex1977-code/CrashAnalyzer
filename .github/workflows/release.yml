@@ -35,8 +35,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt pytest httpx pyinstaller pillow
 
-      - name: Tests
-        run: python -m pytest -q
+      - name: Tests (ohne maschinenspezifische Integrationstests)
+        run: python -m pytest -q -m "not integration"
 
       - name: Icon + EXE bauen
         run: |
