@@ -1,0 +1,116 @@
+[
+  {
+    "id": "rec_backup_now",
+    "title": "Wichtige Daten sofort sichern",
+    "text": "Es gibt Hinweise auf ein Datenträgerproblem. Sichern Sie jetzt wichtige Dateien auf ein externes Laufwerk oder in die Cloud, bevor Sie weitere Reparaturen versuchen.",
+    "category": "sofort", "priority": 1, "tool_id": null, "command": null
+  },
+  {
+    "id": "rec_windows_update",
+    "title": "Windows Update ausführen",
+    "text": "Installieren Sie alle verfügbaren Windows-Updates inklusive optionaler Treiber-Updates. Viele Absturzursachen werden durch Updates behoben.",
+    "category": "sofort", "priority": 1, "tool_id": null, "command": "ms-settings:windowsupdate"
+  },
+  {
+    "id": "rec_driver_update",
+    "title": "Treiber aktualisieren",
+    "text": "Aktualisieren Sie Chipsatz-, Grafik-, Netzwerk- und Speichertreiber — am besten direkt von der Website des PC- bzw. Komponenten-Herstellers. Das Treiber-Inventar in dieser App zeigt, welche Treiber zuletzt geändert wurden.",
+    "category": "sofort", "priority": 1, "tool_id": "driver_inventory", "command": null
+  },
+  {
+    "id": "rec_gpu_driver",
+    "title": "Grafiktreiber sauber neu installieren",
+    "text": "Laden Sie den aktuellen Grafiktreiber direkt beim Hersteller (NVIDIA/AMD/Intel) und wählen Sie bei der Installation die Option \"Neuinstallation\"/\"Saubere Installation\". Bei hartnäckigen Problemen vorher den alten Treiber mit dem Herstellertool entfernen.",
+    "category": "sofort", "priority": 1, "tool_id": null, "command": null
+  },
+  {
+    "id": "rec_sfc",
+    "title": "Systemdateien prüfen (SFC)",
+    "text": "Die Systemdateien-Prüfung findet und repariert beschädigte Windows-Dateien. Sie können sie direkt hier in der App unter \"Prüftools\" starten.",
+    "category": "sofort", "priority": 1, "tool_id": "sfc", "command": "sfc /scannow"
+  },
+  {
+    "id": "rec_dism",
+    "title": "Windows-Abbild prüfen (DISM)",
+    "text": "DISM prüft den Komponentenspeicher von Windows und kann ihn bei Bedarf reparieren. Zuerst \"prüfen\" ausführen; meldet es Probleme, danach \"reparieren\".",
+    "category": "sofort", "priority": 2, "tool_id": "dism_scan", "command": "DISM /Online /Cleanup-Image /ScanHealth"
+  },
+  {
+    "id": "rec_fastboot_off",
+    "title": "Schnellstart deaktivieren",
+    "text": "Der Windows-Schnellstart verursacht bei manchen Systemen Probleme beim Herunterfahren und Aufwachen. Deaktivieren: Systemsteuerung → Energieoptionen → \"Auswählen, was beim Drücken des Netzschalters geschehen soll\" → Haken bei \"Schnellstart aktivieren\" entfernen.",
+    "category": "sofort", "priority": 2, "tool_id": null, "command": null
+  },
+  {
+    "id": "rec_memtest",
+    "title": "Arbeitsspeicher testen",
+    "text": "Starten Sie die Windows-Speicherdiagnose (hier unter \"Prüftools\", erfordert einen Neustart). Für einen gründlicheren Test empfiehlt sich MemTest86 von einem USB-Stick über Nacht.",
+    "category": "diagnose", "priority": 2, "tool_id": "memdiag_start", "command": "mdsched.exe"
+  },
+  {
+    "id": "rec_chkdsk",
+    "title": "Datenträger auf Fehler prüfen",
+    "text": "Die Datenträgerprüfung kontrolliert das Dateisystem (nur lesend, ohne Neustart). Sie können sie direkt hier in der App unter \"Prüftools\" starten.",
+    "category": "diagnose", "priority": 2, "tool_id": "chkdsk", "command": "chkdsk C:"
+  },
+  {
+    "id": "rec_disk_health",
+    "title": "Datenträger-Gesundheit (SMART) prüfen",
+    "text": "Prüfen Sie den Gesundheitszustand von SSDs/Festplatten (Verschleiß, Lesefehler). Direkt hier in der App unter \"Prüftools\" — für Details eignet sich zusätzlich CrystalDiskInfo.",
+    "category": "diagnose", "priority": 2, "tool_id": "disk_health", "command": null
+  },
+  {
+    "id": "rec_temps",
+    "title": "Temperaturen und Lüfter prüfen",
+    "text": "Überhitzung führt zu Abstürzen und Notabschaltungen. Prüfen Sie die Temperaturen unter Last mit einem Tool wie HWMonitor oder LibreHardwareMonitor, reinigen Sie Lüfter und Kühlkörper von Staub und stellen Sie sicher, dass alle Lüfter drehen.",
+    "category": "diagnose", "priority": 2, "tool_id": null, "command": null
+  },
+  {
+    "id": "rec_uninstall_recent",
+    "title": "Kürzlich installierte Software/Treiber entfernen",
+    "text": "Traten die Abstürze erst seit kurzem auf, deinstallieren Sie testweise zuletzt installierte Programme oder rollen Sie kürzlich aktualisierte Treiber im Geräte-Manager zurück (\"Vorheriger Treiber\").",
+    "category": "diagnose", "priority": 2, "tool_id": "driver_inventory", "command": null
+  },
+  {
+    "id": "rec_usb_unplug",
+    "title": "USB-Geräte testweise abziehen",
+    "text": "Trennen Sie alle nicht benötigten USB-Geräte (Hubs, Adapter, externe Platten) und beobachten Sie, ob die Abstürze aufhören. So lässt sich ein defektes Gerät eingrenzen.",
+    "category": "diagnose", "priority": 2, "tool_id": null, "command": null
+  },
+  {
+    "id": "rec_bios_update",
+    "title": "BIOS/UEFI und Firmware aktualisieren",
+    "text": "Prüfen Sie auf der Website des Mainboard-/PC-Herstellers, ob ein BIOS/UEFI-Update vorliegt, und aktualisieren Sie auch die SSD-Firmware mit dem Hersteller-Tool. Firmware-Fehler sind eine häufige, oft übersehene Absturzursache.",
+    "category": "hardware", "priority": 3, "tool_id": null, "command": null
+  },
+  {
+    "id": "rec_ram_reseat",
+    "title": "RAM-Riegel neu einsetzen und einzeln testen",
+    "text": "PC ausschalten und vom Strom trennen, RAM-Riegel herausnehmen, Kontakte prüfen und wieder fest einsetzen. Bei anhaltenden Problemen mit nur einem Riegel testen und die Riegel durchtauschen, um einen defekten zu finden.",
+    "category": "hardware", "priority": 3, "tool_id": null, "command": null
+  },
+  {
+    "id": "rec_cables_psu",
+    "title": "Stromversorgung und Kabel prüfen",
+    "text": "Prüfen Sie Steckdose/Steckerleiste, das Netzkabel und im PC alle Stromstecker (Mainboard, Grafikkarte, Laufwerke). Ein alterndes Netzteil kann unter Last plötzliche Abschaltungen verursachen — im Zweifel testweise ein anderes Netzteil verwenden.",
+    "category": "hardware", "priority": 3, "tool_id": null, "command": null
+  },
+  {
+    "id": "rec_no_oc",
+    "title": "Übertaktung/XMP deaktivieren",
+    "text": "Deaktivieren Sie testweise im BIOS/UEFI alle Übertaktungen inklusive XMP/EXPO-Speicherprofil und Undervolting. Läuft das System dann stabil, war die Einstellung zu aggressiv.",
+    "category": "hardware", "priority": 3, "tool_id": null, "command": null
+  },
+  {
+    "id": "rec_battery",
+    "title": "Akku und Netzteil des Laptops prüfen",
+    "text": "Bei Laptops: Prüfen Sie, ob der Absturz auch im reinen Netzbetrieb bzw. reinen Akkubetrieb auftritt. Ein gealterter Akku oder ein defektes Netzteil kann plötzliche Abschaltungen verursachen (Akkubericht: powercfg /batteryreport).",
+    "category": "hardware", "priority": 3, "tool_id": null, "command": "powercfg /batteryreport"
+  },
+  {
+    "id": "rec_professional",
+    "title": "Fachwerkstatt einschalten",
+    "text": "Wenn die Abstürze nach diesen Schritten weiter auftreten, liegt wahrscheinlich ein Hardwaredefekt vor (Mainboard, CPU, Netzteil). Nehmen Sie diese Analyse und, falls vorhanden, die Datei C:\\Windows\\MEMORY.DMP mit zur Diagnose.",
+    "category": "profi", "priority": 4, "tool_id": null, "command": null
+  }
+]

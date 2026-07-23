@@ -1,0 +1,134 @@
+{
+  "10": {
+    "name": "IRQL_NOT_LESS_OR_EQUAL",
+    "klartext": "Ein Treiber hat auf Speicher zugegriffen, auf den er in diesem Moment nicht zugreifen durfte. Meist steckt ein fehlerhafter Gerätetreiber dahinter, seltener defekter Arbeitsspeicher.",
+    "ursachen": ["Fehlerhafter Gerätetreiber", "Defekter Arbeitsspeicher (RAM)", "Inkompatible Software mit Kernel-Komponenten (z. B. Virenscanner, VPN)"],
+    "rec_ids": ["rec_driver_update", "rec_windows_update", "rec_memtest", "rec_sfc"]
+  },
+  "26": {
+    "name": "MEMORY_MANAGEMENT",
+    "klartext": "Die Speicherverwaltung von Windows ist auf einen schweren Fehler gestoßen. Das ist ein typisches Anzeichen für defekten oder instabil laufenden Arbeitsspeicher.",
+    "ursachen": ["Defekter Arbeitsspeicher (RAM)", "Instabiles RAM-Profil (XMP/Übertaktung)", "Fehlerhafter Treiber"],
+    "rec_ids": ["rec_memtest", "rec_ram_reseat", "rec_no_oc", "rec_driver_update"]
+  },
+  "30": {
+    "name": "KMODE_EXCEPTION_NOT_HANDLED",
+    "klartext": "Ein Programm im Windows-Kern (meist ein Treiber) hat einen Fehler ausgelöst, den Windows nicht abfangen konnte.",
+    "ursachen": ["Fehlerhafter Gerätetreiber", "Defekter Arbeitsspeicher", "Beschädigte Systemdateien"],
+    "rec_ids": ["rec_driver_update", "rec_sfc", "rec_memtest"]
+  },
+  "36": {
+    "name": "NTFS_FILE_SYSTEM",
+    "klartext": "Im Dateisystem des Datenträgers ist ein schwerer Fehler aufgetreten. Das kann auf eine beschädigte Festplatte/SSD hindeuten — wichtige Daten sollten jetzt gesichert werden.",
+    "ursachen": ["Beschädigtes Dateisystem", "Defekte Festplatte/SSD", "Fehlerhafter Speichertreiber"],
+    "rec_ids": ["rec_backup_now", "rec_chkdsk", "rec_disk_health"]
+  },
+  "59": {
+    "name": "SYSTEM_SERVICE_EXCEPTION",
+    "klartext": "Beim Ausführen einer Systemfunktion ist ein unerwarteter Fehler aufgetreten. Häufigste Auslöser sind Grafiktreiber oder andere frisch aktualisierte Treiber.",
+    "ursachen": ["Grafiktreiber", "Anderer fehlerhafter Treiber", "Beschädigte Systemdateien"],
+    "rec_ids": ["rec_gpu_driver", "rec_driver_update", "rec_windows_update", "rec_sfc"]
+  },
+  "80": {
+    "name": "PAGE_FAULT_IN_NONPAGED_AREA",
+    "klartext": "Windows hat Daten in einem Speicherbereich gesucht, der nicht vorhanden war. Deutet auf defekten Arbeitsspeicher oder einen fehlerhaften Treiber hin.",
+    "ursachen": ["Defekter Arbeitsspeicher", "Fehlerhafter Treiber", "Defekter Datenträger (Auslagerungsdatei)", "Virenscanner-Konflikte"],
+    "rec_ids": ["rec_memtest", "rec_driver_update", "rec_sfc", "rec_chkdsk"]
+  },
+  "122": {
+    "name": "KERNEL_DATA_INPAGE_ERROR",
+    "klartext": "Windows konnte wichtige Daten nicht vom Datenträger lesen. Das spricht für ein Problem mit Festplatte/SSD, deren Verkabelung oder dem Speichercontroller — Daten jetzt sichern.",
+    "ursachen": ["Defekte Festplatte/SSD", "Lockeres/defektes SATA- oder Stromkabel", "Defekter Arbeitsspeicher", "Controller-/Treiberproblem"],
+    "rec_ids": ["rec_backup_now", "rec_chkdsk", "rec_disk_health", "rec_cables_psu"]
+  },
+  "126": {
+    "name": "SYSTEM_THREAD_EXCEPTION_NOT_HANDLED",
+    "klartext": "Ein Systemprozess ist wegen eines Treiberfehlers abgestürzt. Oft nennt der Absturz sogar die verantwortliche Treiberdatei.",
+    "ursachen": ["Fehlerhafter Gerätetreiber (oft Grafik/Netzwerk)", "Inkompatibles Treiber-Update", "Beschädigte Systemdateien"],
+    "rec_ids": ["rec_driver_update", "rec_windows_update", "rec_sfc"]
+  },
+  "159": {
+    "name": "DRIVER_POWER_STATE_FAILURE",
+    "klartext": "Ein Treiber hat beim Energiesparen oder Aufwachen (Standby/Ruhezustand) nicht reagiert. Typisch nach Treiber-Updates oder bei problematischen Energiespar-Einstellungen.",
+    "ursachen": ["Treiber verträgt Energiesparmodus nicht", "Veralteter Chipsatz-/GPU-/WLAN-Treiber", "Schnellstart-Funktion"],
+    "rec_ids": ["rec_driver_update", "rec_windows_update", "rec_fastboot_off"]
+  },
+  "194": {
+    "name": "BAD_POOL_CALLER",
+    "klartext": "Ein Treiber hat den Kernel-Speicher falsch benutzt. Fast immer ist ein fehlerhafter oder inkompatibler Treiber die Ursache.",
+    "ursachen": ["Fehlerhafter Treiber", "Inkompatible Systemsoftware", "Selten: RAM-Defekt"],
+    "rec_ids": ["rec_driver_update", "rec_windows_update", "rec_memtest"]
+  },
+  "209": {
+    "name": "DRIVER_IRQL_NOT_LESS_OR_EQUAL",
+    "klartext": "Ein Treiber hat im falschen Moment auf Speicher zugegriffen. Sehr häufig sind Netzwerk- oder WLAN-Treiber verantwortlich.",
+    "ursachen": ["Netzwerk-/WLAN-Treiber", "Anderer fehlerhafter Treiber", "Virenscanner/VPN-Software"],
+    "rec_ids": ["rec_driver_update", "rec_windows_update"]
+  },
+  "239": {
+    "name": "CRITICAL_PROCESS_DIED",
+    "klartext": "Ein für Windows lebenswichtiger Prozess ist unerwartet beendet worden. Ursache sind oft beschädigte Systemdateien oder Probleme mit dem Datenträger.",
+    "ursachen": ["Beschädigte Systemdateien", "Fehlerhafte Windows-Updates", "Datenträgerprobleme", "Malware"],
+    "rec_ids": ["rec_sfc", "rec_dism", "rec_chkdsk", "rec_uninstall_recent"]
+  },
+  "244": {
+    "name": "CRITICAL_OBJECT_TERMINATION",
+    "klartext": "Ein kritischer Systemprozess wurde beendet — häufig, weil der Datenträger nicht mehr richtig antwortete. Daten sichern und Datenträger prüfen.",
+    "ursachen": ["Festplatte/SSD antwortet nicht mehr", "Beschädigte Systemdateien", "Defekter AHCI-/NVMe-Treiber"],
+    "rec_ids": ["rec_backup_now", "rec_chkdsk", "rec_disk_health", "rec_sfc"]
+  },
+  "257": {
+    "name": "CLOCK_WATCHDOG_TIMEOUT",
+    "klartext": "Ein Prozessorkern hat nicht mehr auf das System reagiert. Das deutet auf ein Hardware-Problem mit CPU, Mainboard oder instabile Übertaktung hin.",
+    "ursachen": ["Instabile Übertaktung/XMP", "CPU- oder Mainboard-Problem", "Veraltetes BIOS/UEFI", "Überhitzung"],
+    "rec_ids": ["rec_no_oc", "rec_temps", "rec_bios_update", "rec_professional"]
+  },
+  "278": {
+    "name": "VIDEO_TDR_FAILURE",
+    "klartext": "Die Grafikkarte hat nicht mehr reagiert und konnte auch nicht zurückgesetzt werden. Klassischer Grafiktreiber- oder Grafikkarten-Fehler.",
+    "ursachen": ["Grafiktreiber abgestürzt", "Grafikkarte überhitzt oder defekt", "Instabile GPU-Übertaktung"],
+    "rec_ids": ["rec_gpu_driver", "rec_temps", "rec_no_oc"]
+  },
+  "281": {
+    "name": "VIDEO_SCHEDULER_INTERNAL_ERROR",
+    "klartext": "Interner Fehler in der Grafik-Verarbeitung von Windows. Meist ist der Grafiktreiber verantwortlich, seltener die Grafikkarte selbst.",
+    "ursachen": ["Grafiktreiber", "Defekte Grafikkarte", "Beschädigte DirectX-Komponenten"],
+    "rec_ids": ["rec_gpu_driver", "rec_windows_update", "rec_temps"]
+  },
+  "292": {
+    "name": "WHEA_UNCORRECTABLE_ERROR",
+    "klartext": "Die Hardware selbst hat einen nicht korrigierbaren Fehler gemeldet (CPU, Spannungsversorgung, Mainboard). Häufige Auslöser: Überhitzung, instabile Übertaktung oder ein Hardwaredefekt.",
+    "ursachen": ["Überhitzung (CPU/Spannungswandler)", "Instabile Übertaktung oder Undervolting", "Defekte CPU / Mainboard / Netzteil", "Veraltetes BIOS/UEFI"],
+    "rec_ids": ["rec_temps", "rec_no_oc", "rec_bios_update", "rec_ram_reseat", "rec_professional"]
+  },
+  "307": {
+    "name": "DPC_WATCHDOG_VIOLATION",
+    "klartext": "Ein Treiber hat das System zu lange blockiert. Sehr häufig stecken veraltete SSD-Firmware oder Speicher-/Chipsatztreiber dahinter.",
+    "ursachen": ["Veraltete SSD-Firmware", "Speicher-/Chipsatz-Treiber", "Anderer blockierender Treiber"],
+    "rec_ids": ["rec_driver_update", "rec_bios_update", "rec_windows_update"]
+  },
+  "313": {
+    "name": "KERNEL_SECURITY_CHECK_FAILURE",
+    "klartext": "Windows hat eine beschädigte Datenstruktur im Kern entdeckt. Ursache sind meist fehlerhafte Treiber oder defekter Arbeitsspeicher.",
+    "ursachen": ["Fehlerhafter Treiber", "Defekter Arbeitsspeicher", "Beschädigte Systemdateien"],
+    "rec_ids": ["rec_memtest", "rec_driver_update", "rec_sfc"]
+  },
+  "314": {
+    "name": "KERNEL_MODE_HEAP_CORRUPTION",
+    "klartext": "Der Kernel-Speicher wurde beschädigt — typischerweise durch einen fehlerhaften Treiber (oft Grafik) oder defekten Arbeitsspeicher.",
+    "ursachen": ["Grafiktreiber", "Anderer fehlerhafter Treiber", "Defekter Arbeitsspeicher"],
+    "rec_ids": ["rec_gpu_driver", "rec_driver_update", "rec_memtest"]
+  },
+  "340": {
+    "name": "UNEXPECTED_STORE_EXCEPTION",
+    "klartext": "Der komprimierte Speicher von Windows ist auf einen Fehler gestoßen — sehr oft ein Anzeichen für eine alternde oder fehlerhafte SSD. Daten sichern.",
+    "ursachen": ["SSD-Probleme/alternde SSD", "Veraltete SSD-Firmware", "Defekter Arbeitsspeicher"],
+    "rec_ids": ["rec_backup_now", "rec_disk_health", "rec_chkdsk", "rec_bios_update"]
+  },
+  "254": {
+    "name": "BUGCODE_USB_DRIVER",
+    "klartext": "Ein USB-Treiber oder ein USB-Gerät hat den Absturz ausgelöst. Häufig hilft es, USB-Geräte testweise abzuziehen und die Treiber zu aktualisieren.",
+    "ursachen": ["Defektes USB-Gerät", "USB-Treiber", "USB-Hub/Verkabelung"],
+    "rec_ids": ["rec_usb_unplug", "rec_driver_update", "rec_windows_update"]
+  }
+}
