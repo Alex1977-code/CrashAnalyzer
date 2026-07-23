@@ -10,8 +10,10 @@ selbst aktualisieren. Alle Daten bleiben auf dem Rechner.
 **⬇ [CrashAnalyzer.exe herunterladen](https://github.com/Alex1977-code/CrashAnalyzer/releases/latest/download/CrashAnalyzer.exe)** — keine Installation nötig, einfach starten.
 
 - Für volle Funktion (Minidumps, SFC/DISM/CHKDSK) per Rechtsklick → **Als Administrator ausführen**.
-- Die EXE ist nicht signiert: Windows SmartScreen kann warnen — „Weitere Informationen" →
-  „Trotzdem ausführen". Die Prüfsumme (SHA256) steht in den [Release-Notes](https://github.com/Alex1977-code/CrashAnalyzer/releases/latest).
+- Die EXE ist Authenticode-**signiert** (selbstsigniert, `CN=Alexander May`, mit Zeitstempel) —
+  siehe [Code-Signing](#code-signing). Windows SmartScreen kann auf fremden Rechnern trotzdem
+  warnen: „Weitere Informationen" → „Trotzdem ausführen". Prüfsumme (SHA256) in den
+  [Release-Notes](https://github.com/Alex1977-code/CrashAnalyzer/releases/latest).
 - Einstellungen werden unter `%LOCALAPPDATA%\CrashAnalyzer` gespeichert.
 
 ## Start aus dem Quellcode
@@ -72,6 +74,35 @@ Feed-Format (JSON):
 ```json
 { "version": "1.1.0", "zip_url": "…", "sha256": "…", "notes": "…", "exe_url": "…", "release_url": "…" }
 ```
+
+## Code-Signing
+
+Die Release-EXE ist mit einem **selbstsignierten** Zertifikat signiert
+(`CN=Alexander May, O=Alex1977-code`, SHA256, DigiCert-Zeitstempel). Das macht
+die Datei fälschungssicher nachweisbar, entfernt aber die SmartScreen-Warnung
+auf fremden Rechnern **nicht**.
+
+**Eigenen Rechnern voll vertrauen** (bewusste Vertrauensentscheidung, als Administrator):
+
+```powershell
+Import-Certificate -FilePath build\AlexanderMay-CodeSigning.cer -CertStoreLocation Cert:\LocalMachine\Root
+Import-Certificate -FilePath build\AlexanderMay-CodeSigning.cer -CertStoreLocation Cert:\LocalMachine\TrustedPublisher
+```
+
+Danach meldet `Get-AuthenticodeSignature CrashAnalyzer.exe` den Status `Valid`.
+
+**SmartScreen-Warnung für alle beseitigen:** erfordert ein gekauftes Zertifikat
+mit Identitätsprüfung — z. B. Azure Trusted Signing (~10 €/Monat), Certum
+Code Signing für Einzelentwickler (~25–70 €/Jahr + einmalig Smartcard/Token)
+oder Sectigo/DigiCert OV/EV (~200–500 €/Jahr; EV mit sofortiger
+SmartScreen-Reputation). Sobald vorhanden: signieren mit
+
+```powershell
+.\build\sign.ps1 -Thumbprint <Thumbprint-des-gekauften-Zertifikats>
+```
+
+**Signieren gehört in den Release-Ablauf:** nach dem PyInstaller-Build und vor
+`make_release.py`/Upload `.\build\sign.ps1` ausführen.
 
 ## Grenzen
 
