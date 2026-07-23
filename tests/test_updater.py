@@ -116,6 +116,12 @@ def test_apply_zip_slip_wird_abgelehnt_und_zurueckgerollt(tmp_path):
     assert not (root / "_staging" / "update.zip").exists(), "Staging trotzdem geleert"
 
 
+def test_version_mit_utf8_bom_wird_sauber_gelesen(tmp_path):
+    # PowerShell 5.1 (Set-Content -Encoding utf8) schreibt BOM
+    (tmp_path / "VERSION").write_bytes(b"\xef\xbb\xbf1.0.0\r\n")
+    assert updater.current_version(tmp_path) == "1.0.0"
+
+
 def test_semver_vergleich():
     assert updater.is_newer("1.10.0", "1.9.9")
     assert not updater.is_newer("1.0.0", "1.0.0")

@@ -42,7 +42,8 @@ def is_newer(candidate: str, current: str) -> bool:
 
 def current_version(root: str | Path = APP_ROOT) -> str:
     try:
-        return (Path(root) / "VERSION").read_text(encoding="utf-8").strip()
+        # utf-8-sig: toleriert BOM (z. B. von PowerShell 5.1 geschrieben)
+        return (Path(root) / "VERSION").read_text(encoding="utf-8-sig").strip()
     except OSError:
         return "0.0.0"
 
